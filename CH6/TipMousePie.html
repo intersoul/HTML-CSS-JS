@@ -1,0 +1,155 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>饼状图</title>
+    <style>
+        .tooltip {
+            font-family: simsun;
+            font-size: 14px;
+            width: 120;
+            height: auto;
+            position: absolute;
+            text-align: center;
+            border-style: solid;
+            border-width: 1px;
+            background-color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="/JS/d3.v7.min.js" charset="utf-8"></script>
+    <script>
+        var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var width = w * 0.98;
+        var height = h * 0.96;
+
+
+
+
+        var dataset = [["Chrome", 39.49], ["IE", 29.06], ["QQ", 4.84], ["2345", 4.28], ["搜狗高速", 4.19], ["猎豹", 2.24], ["其他", 15.91]];
+
+
+
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+        var pie = d3.pie()
+            .value(function (d) { return d[1]; });
+        var piedata = pie(dataset);
+        var outerRadius = 150;	//外半径
+        var innerRadius = 50;	//内半径，为0则中间没有空白
+        var arc = d3.arc()	//弧生成器
+            .innerRadius(innerRadius)	//设置内半径
+            .outerRadius(outerRadius);	//设置外半径
+        var color = d3.schemeCategory10;
+        var arcs = svg.selectAll("g")
+            .data(piedata)
+            .enter()
+            .append("g")
+            .attr("transform", "translate(" + (width / 2) + "," + (height / 2) + ")");
+        arcs.append("path")//每个g元素都追加一个path元素用绑定到这个g的数据d生成路径信息
+            .attr("fill", (d, i) => color[i % 10])
+            .attr("d", (d) => arc(d));
+
+        arcs.append("text")
+            .attr("transform", function (d) {
+                var x = arc.centroid(d)[0] * 1.1;
+                var y = arc.centroid(d)[1] * 1.1;
+                return "translate(" + x + "," + y + ")";
+            })
+            .attr("text-anchor", "middle")
+            .attr("font-size", 14)
+            .text(function (d) {
+                return d.value + "%";
+            })
+            .on("mouseover", function (event, d) {
+                if (d.data[1] < 10) {
+                    d3.select(this)
+                        .attr("font-size", 24);
+                }
+            })
+            .on("mouseout", function (event, d) {
+                if (d.data[1] < 10) {
+                    d3.select(this)
+                        .attr("font-size", function (d) {
+                            return d.value + "px";
+                        });
+                }
+            });
+        //添加一个提示框
+        var tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0.0);
+
+        arcs.on("mouseover", function (event, d) {
+            tooltip.html(d.data[0] + "浏览器市场份额" + "<br />" + d.data[1] + "%")
+                .style("left", (event.pageX) + "px")
+                .style("top", (event.pageY + 20) + "px")
+                .style("opacity", 1.0);
+            d3.select(this)
+                .style("cursor", "move");
+        })
+            .on("mousemove", function (event, d) {
+                tooltip.style("left", (event.pageX) + "px")
+                    .style("top", (event.pageY + 20) + "px");
+            })
+            .on("mouseout", function (d) {
+                tooltip.style("opacity", 0.0);
+            });
+    </script>
+    <!-- <svg width="725.1999999999999" height="576">
+        <g transform="translate(362.59999999999997,288)" style="cursor: move;">
+            <path fill="#1f77b4"
+                d="M9.184850993605149e-15,-150A150,150,0,0,1,92.03989848461454,118.44263205004289L30.67996616153818,39.480877350014296A50,50,0,0,0,3.061616997868383e-15,-50Z">
+            </path><text transform="translate(104.05376571442156,-35.67651665519308)" text-anchor="middle"
+                font-size="14">39.49%</text>
+        </g>
+        <g transform="translate(362.59999999999997,288)">
+            <path fill="#ff7f0e"
+                d="M92.03989848461454,118.44263205004289A150,150,0,0,1,-137.82418342900496,59.198770782238356L-45.941394476334985,19.732923594079452A50,50,0,0,0,30.67996616153818,39.480877350014296Z">
+            </path><text transform="translate(-27.453604040683093,106.5190106280442)" text-anchor="middle"
+                font-size="14">29.06%</text>
+        </g>
+        <g transform="translate(362.59999999999997,288)" style="cursor: move;">
+            <path fill="#2ca02c"
+                d="M-124.31814975343994,-83.93448422359718A150,150,0,0,1,-93.48399435037756,-117.30619250618689L-31.16133145012585,-39.10206416872896A50,50,0,0,0,-41.439383251146644,-27.978161407865727Z">
+            </path><text transform="translate(-80.79277217177369,-74.64936680776249)" text-anchor="middle"
+                font-size="14">4.84%</text>
+        </g>
+        <g transform="translate(362.59999999999997,288)" style="cursor: move;">
+            <path fill="#d62728"
+                d="M-93.48399435037756,-117.30619250618689A150,150,0,0,1,-58.960563266538564,-137.92625558352734L-19.653521088846187,-45.97541852784244A50,50,0,0,0,-31.16133145012585,-39.10206416872896Z">
+            </path><text transform="translate(-56.40535975269669,-94.43746815310577)" text-anchor="middle"
+                font-size="4.28px">4.28%</text>
+        </g>
+        <g transform="translate(362.59999999999997,288)" style="cursor: move;">
+            <path fill="#9467bd"
+                d="M-58.960563266538564,-137.92625558352734A150,150,0,0,1,-21.03978302508776,-148.51709507749345L-7.013261008362587,-49.505698359164484A50,50,0,0,0,-19.653521088846187,-45.97541852784244Z">
+            </path><text transform="translate(-29.58938953679205,-105.94558993577782)" text-anchor="middle"
+                font-size="14">4.19%</text>
+        </g>
+        <g transform="translate(362.59999999999997,288)">
+            <path fill="#8c564b"
+                d="M-21.03978302508776,-148.51709507749345A150,150,0,0,1,1.0567220997420333e-13,-150L3.522406999140111e-14,-50A50,50,0,0,0,-7.013261008362587,-49.505698359164484Z">
+            </path><text transform="translate(-7.733724752090432,-109.72779730523577)" text-anchor="middle"
+                font-size="14">2.24%</text>
+        </g>
+        <g transform="translate(362.59999999999997,288)" style="cursor: move;">
+            <path fill="#e377c2"
+                d="M-137.82418342900496,59.198770782238356A150,150,0,0,1,-124.31814975343994,-83.93448422359718L-41.439383251146644,-27.978161407865727A50,50,0,0,0,-45.941394476334985,19.732923594079452Z">
+            </path><text transform="translate(-109.5135380556673,-10.333681944491547)" text-anchor="middle"
+                font-size="14">15.91%</text>
+        </g>
+    </svg> -->
+    <div class="tooltip" style="opacity: 0; left: 308px; top: 206px;">2345浏览器市场份额<br>4.28%</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <center>
+        <h2>数据可视化之JS Canvas 图像处理</h2>
+        <button id="invert" color="blue">翻转</button>
+        <hr width=70%>
+        </hr>
+        <canvas id="myCanvas" style="border:1px solid #c3c3c3;"></canvas>
+        <script type="text/javascript">
+            var c = document.getElementById("myCanvas");
+            var cxt = c.getContext("2d");
+            var img = new Image()
+            img.src = "/img/jiajiazi.jpg"
+            img.onload = function () {
+                // 计算图片的实际显示尺寸，使其自适应 canvas
+                var canvasWidth = c.width;
+                var canvasHeight = c.height;
+                var imageAspectRatio = img.width / img.height;
+                var canvasAspectRatio = canvasWidth / canvasHeight;
+                var renderableWidth, renderableHeight;
+
+                if (imageAspectRatio < canvasAspectRatio) {
+                    renderableWidth = canvasWidth;
+                    renderableHeight = renderableWidth / imageAspectRatio;
+                } else {
+                    renderableHeight = canvasHeight;
+                    renderableWidth = renderableHeight * imageAspectRatio;
+                }
+
+                // 清空 canvas
+                cxt.clearRect(0, 0, canvasWidth, canvasHeight);
+                // 绘制图片
+                cxt.drawImage(img, 0, 0, renderableWidth, renderableHeight);
+
+                var imageData = cxt.getImageData(0, 0, renderableWidth, renderableHeight);
+                var data = imageData.data;
+
+                var invert = function () {
+                    for (var i = 0; i < data.length; i += 4) {
+                        data[i] = 255 - data[i]; // red
+                        data[i + 1] = 255 - data[i + 1]; // green
+                        data[i + 2] = 255 - data[i + 2]; // blue
+                    }
+                    cxt.putImageData(imageData, 0, 0);
+                }
+
+                var invertbtn = document.getElementById('invert');
+                invertbtn.addEventListener('click', invert);
+            }
+
+        </script>
+    </center>
+
+</body>
+
+</html>

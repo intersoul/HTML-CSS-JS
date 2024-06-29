@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <script src="../d3.v7.js"></script>
+    <script>
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.96;
+        var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.98;
+        var color = d3.schemeCategory10;
+        var svg = d3.select("body")			//选择<body>
+            .append("svg")			//在<body>中添加<svg>
+            .attr("width", width)	//设定<svg>的宽度属性
+            .attr("height", height);//设定<svg>的高度属性
+
+
+        var tree = d3.tree()
+            .size([height, width]);
+        d3.json("d3v3tree.json").then(function (data) {
+
+            console.log(data);
+            var hi = d3.hierarchy(data);
+            console.log(hi);
+            var root = tree(hi);
+            console.log(root);
+            links = root.links();
+            console.log(links);
+            nodes = root.descendants();
+            console.log(nodes);
+
+            var gc = svg.append("g")
+                .attr("transform", "translate(" + (width / 20) + "," + (height / 100) + ")");
+            var lines = gc.selectAll("path")
+                .data(links)
+                .enter()
+                .append("path")
+                .attr("fill", "none")
+                .attr("stroke", "#00f")
+                .attr("d", d3.linkHorizontal()          //d3.linkHorizontal()
+                    .x(d => d.y)
+                    .y(d => d.x)
+                );
+
+        })
+    </script>
+    <!-- Cloudflare Pages Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+        data-cf-beacon='{"token": "d912c94599ab449bbf0813bd77f413e8"}'></script><!-- Cloudflare Pages Analytics -->
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>svg 箭头绘制</title>
+</head>
+
+<body>
+    <svg width="600px" height="600px">
+        <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refx="0" refy="4" orient="auto"
+                markerUnits="strokeWidth">
+                <path d="M3,0 L0,2 L0,6 L3,8 L9,4  z" fill="#eacf01" />
+            </marker>
+        </defs>
+        <line x1="5" y1="5" x2="250" y2="5" stroke="#eacf01" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="5" y1="5" x2="5" y2="250" stroke="#eacf01" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="5" y1="5" x2="100" y2="100" stroke="#eacf01" stroke-width="10" marker-end="url(#arrow)" />
+    </svg>
+</body>
+
+<html>

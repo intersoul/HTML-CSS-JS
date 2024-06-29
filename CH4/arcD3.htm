@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3弧线生成器</title>
+</head>
+
+<body>
+
+    <script src="d3.v3.min.js" charset="utf-8"></script>
+    <script>
+        var width = 500;	//SVG绘制区域的宽度
+        var height = 500;	//SVG绘制区域的高度	
+        var svg = d3.select("body")			//选择<body>
+            .append("svg")			//在<body>中添加<svg>
+            .attr("width", width)	//设定<svg>的宽度属性
+            .attr("height", height);//设定<svg>的高度属性
+        var dataset = { startAngle: -Math.PI / 3, endAngle: Math.PI / 3 };
+        //创建一个弧生成器
+        var arcPath = d3.svg.arc()
+            .innerRadius(0)//内半径
+            .outerRadius(100);//外半径
+
+        //添加路径
+        // 在SVG容器中添加一个路径元素
+        svg.append("path")
+            // 设置路径的形状，使用arcPath函数生成路径形状，基于给定的dataset数据集
+            .attr("d", arcPath(dataset))
+            // 对路径元素进行平移变换，将其移动到坐标 (250, 250) 的位置
+            .attr("transform", "translate(250,250)")
+            // 设置路径的边框颜色为黑色
+            .attr("stroke", "black")
+            // 设置路径的边框宽度为3像素
+            .attr("stroke-width", "1px")
+            // 设置路径的填充颜色为蓝色，即路径内部的颜色
+            .attr("fill", "blue");
+
+        var dataset1 = { startAngle: -Math.PI / 3, endAngle: Math.PI / 3 };
+        //创建一个弧生成器
+        var arcPath = d3.svg.arc()
+            .innerRadius(0)//内半径
+            .outerRadius(100);//外半径
+        //创建一个弧生成器
+        var arcPath = d3.svg.arc()
+            .innerRadius(0)//内半径
+            .outerRadius(100);//外半径
+
+        //添加路径
+        // 在SVG容器中添加一个路径元素
+        svg.append("path")
+            // 设置路径的形状，使用arcPath函数生成路径形状，基于给定的dataset数据集
+            .attr("d", arcPath(dataset1))
+            // 对路径元素进行平移变换，将其移动到坐标 (250, 250) 的位置
+            .attr("transform", "translate(425,250)")
+            // 设置路径的边框颜色为黑色
+            .attr("stroke", "black")
+            // 设置路径的边框宽度为3像素
+            .attr("stroke-width", "1px")
+            // 设置路径的填充颜色为蓝色，即路径内部的颜色
+            .attr("fill", "red");
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Image Canvas</title>
+
+</head>
+
+<body>
+    <h2>Image Canvas</h2>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #c3c3c3; ;"></canvas>
+
+    <script type="text/javascript">
+        var c = document.getElementById("myCanvas");
+        var cxt = c.getContext("2d");
+        var img = new Image();
+
+        // 设置图片源
+        img.src = "/img/jiajiazi.jpg";
+
+        // 图片加载完成后执行绘制操作
+        img.onload = function () {
+            // 获取 canvas 的实际显示尺寸
+            var canvasWidth = c.width;
+            var canvasHeight = c.height;
+
+            // 计算图片的实际显示尺寸，使其自适应 canvas
+            var imageAspectRatio = img.width / img.height;
+            var canvasAspectRatio = canvasWidth / canvasHeight;
+
+            var renderableHeight, renderableWidth, xStart, yStart;
+
+            // 如果图片的纵横比大于 canvas 的纵横比，则图片高度占满 canvas 的高度，宽度按比例缩放
+            if (imageAspectRatio > canvasAspectRatio) {
+                renderableHeight = canvasHeight;
+                renderableWidth = img.width * (renderableHeight / img.height);
+                xStart = (canvasWidth - renderableWidth) / 2;
+                yStart = 0;
+            }
+            // 否则，图片宽度占满 canvas 的宽度，高度按比例缩放
+            else {
+                renderableWidth = canvasWidth;
+                renderableHeight = img.height * (renderableWidth / img.width);
+                xStart = 0;
+                yStart = (canvasHeight - renderableHeight) / 2;
+            }
+
+            // 在计算好的位置绘制图片
+            cxt.drawImage(img, xStart, yStart, renderableWidth, renderableHeight);
+        };
+    </script>
+</body>
+
+</html>

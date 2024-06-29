@@ -1,0 +1,107 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>基于GeoJSON绘制北京地图</title>
+	<style>
+		.province {
+			stroke: black;
+			stroke-width: 1px;
+		}
+
+		.southchinasea {
+			stroke: black;
+			stroke-width: 1px;
+			fill: red;
+		}
+	</style>
+</head>
+
+<body>
+	<script src="../JS/d3.v7.min.js" charset="utf-8"></script>
+	<script>
+		var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.98;
+		var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.98;
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width)
+			.attr("height", height);
+
+		var projection = d3.geoMercator()
+			.center([115.5956, 32.33])
+			.scale(7000)
+			.translate([width * 1.4, height / 100]);
+
+		//定义地形路径生成器
+		var geoPath = d3.geoPath()
+			.projection(projection);	//设定投影
+
+		console.log(geoPath);
+		//颜色比例尺
+		var color = d3.schemePaired;           //d3.schemeBlues[9];       //d3.schemeCategory10;
+		console.log(color);
+		// var color = d3.scaleOrdinal(d3.schemeCategory20c);
+		console.log(color);
+
+		//请求ChinaGeo.json
+		d3.json("chongqing.json").then(function (data) {           //100000_full.json  A2_100000_full.json
+
+			console.log(data);
+			var scaleColor = d3.scaleOrdinal()
+				.domain(d3.range(data.features.length))
+				.range(d3.schemeCategory10);
+
+			var groups = svg.append("g");
+
+			groups.selectAll("path")
+				.data(data.features)
+				.enter()
+				.append("path")
+				.attr("class", "province")
+				.attr("stroke", "black")
+
+				.attr("fill", (d, i) => color[i % 12])
+				.attr("d", (d, i) => geoPath(d))	//使用路径生成器
+
+				.each(function (d, i) {
+					var saturation = i % 12 * 20; // 根据索引计算饱和度值，这里以索引模12乘以20作为饱和度值，你可以根据需要调整
+					d3.select(this)
+						.style("filter", "saturate(" + saturation + "%)");
+				})
+
+				.on("mouseover", function (event, d) {
+					d3.select(this)
+						.attr("fill", "yellow");
+				})
+				.on("mouseout", function (event, d) {
+					console.log(d);
+					console.log(event);
+					console.log(this);
+					var p = d3.select(event.currentTarget);
+					console.log(p);
+					var i = data.features.indexOf(p.datum());
+					console.log(i);
+					d3.select(this)
+						.attr("fill", color[i % 12]);
+				});
+
+			var texts = svg.selectAll(".texts")
+				.data(data.features)
+				.enter()
+				.append("text")
+				.attr("class", "texts")
+				.text(function (d, i) { return d.properties.name + "-" + i; })
+				.attr("transform", function (d) {
+					var centroid = geoPath.centroid(d),
+						x = centroid[0],
+						y = centroid[1];
+					return "translate(" + x + ", " + y + ")";
+				})
+				.attr('fill', '999')
+				.attr("font-size", "12px");
+		});
+	</script>
+
+</body>
+
+</html>

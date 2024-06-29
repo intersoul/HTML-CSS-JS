@@ -1,0 +1,113 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>基于GeoJSON绘制中国GDP2016数据地图</title>
+</head>
+
+<body>
+    <script src="../JS/d3.v7.min.js" charset="utf-8"></script>
+    <script>
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.98;
+        var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.98;
+
+        const gdp = [
+            ["密云县", 52.6, 361.9],
+            ["怀柔区", 43.9, 451.5],
+            ["房山区", 131.1, 860.9],
+            ["延庆县", 34.4, 213],
+            ["门头沟区", 39.6, 272.2],
+            ["昌平区", 226.7, 1340.8],
+            ["大兴区", 199.1, 1000],
+            ["顺义区", 132.5, 2080],
+            ["平谷区", 45.6, 408.6],
+            ["通州区", 184.3, 1253.4],
+            ["朝阳区", 344.2, 7911.2],
+            ["海淀区", 312.4, 10206.9],
+            ["丰台区", 201.2, 2061.8],
+            ["石景山区", 56.3, 980],
+            ["西城区", 110.0, 5700.1],
+            ["东城区", 70.4, 3370],
+            ["西城区", 110.0, 5700.1],
+            ["东城区", 70.4, 3370]
+        ];
+
+        const linear = d3.scaleLinear()
+            .domain([200, 11000])
+            // .domain([30, 400])
+            .range([20, 180]);
+        //  .range("black","red");
+
+
+        var mapcolor = new Array();
+        for (var i = 0; i < 18; i++) {
+            mapcolor[i] = "#" + "9" + parseInt(255 - linear(gdp[i][2])).toString(16) + "000";
+        }
+        console.log(mapcolor);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+        console.log(svg);
+        //定义地图的投影
+        const projection = d3.geoMercator()
+            .center([116.3956, 39.93])
+            .scale(15000)
+            .translate([width / 2, height / 2]);
+
+        //定义地形路径生成器
+        var path = d3.geoPath()
+            .projection(projection); //设定投影
+
+        //请求china.geojson
+        d3.json("beijing.json").then(function (root) {
+            console.log(root);
+
+            var groups = svg.append("g");
+
+            groups.selectAll("path")
+                .data(root.features)
+                .enter()
+                .append("path")
+                .attr("class", "province")
+                .attr("stroke", "black")
+                .attr("fill", (d, i) => mapcolor[i])
+                .attr("d", path) //使用路径生成器
+                .on("mouseover", function (event, d) {
+                    console.log("mouseover");
+                    d3.select(this)
+                        .attr("fill", "yellow");
+                })
+                .on("mouseout", function (event, d) {
+                    console.log(d);
+                    console.log(event);
+                    console.log(this);
+                    var p = d3.select(event.currentTarget);
+                    console.log(p);
+                    var i = root.features.indexOf(p.datum());
+                    console.log(i);
+                    d3.select(this)
+                        .attr("fill", mapcolor[i]);
+                });
+
+            var texts = svg.selectAll(".texts")
+                .data(root.features)
+                .enter()
+                .append("text")
+                .attr("class", "texts")
+                .text(function (d, i) { return d.properties.name + "-" + i; })
+                .attr("transform", function (d) {
+                    var centroid = path.centroid(d),
+                        x = centroid[0],
+                        y = centroid[1];
+                    return "translate(" + x + ", " + y + ")";
+                })
+                .attr('fill', '999')
+                .attr("font-size", "10px");
+        });
+    </script>
+    <!-- Cloudflare Pages Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+        data-cf-beacon='{"token": "d912c94599ab449bbf0813bd77f413e8"}'></script><!-- Cloudflare Pages Analytics -->
+
+</html>

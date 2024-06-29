@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3的JSON读取</title>
+    <meta name="viewport" content="width=device-width">
+</head>
+
+<body>
+    <script src=" ./d3.v3.min.js" charset="utf-8">
+    </script>
+    <p>节点信息</p>
+    <script>
+        var mydata;
+        d3.json("force.json", function (error, data) {
+            // console.log(data.nodes);
+            // console.log(data.nodes[0].name);
+            console.log(data.links[1].target);
+            var p = d3.select("p")
+                .text("数据文件中的值" + data.links[0].value + data.links[1].value + data.links[2].value);
+            //myFunction();
+        });
+    </script>
+</body>
+
+</html>

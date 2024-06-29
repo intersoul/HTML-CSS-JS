@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3动画-直方图</title>
+</head>
+
+<body>
+    <script src="/Js/d3.v7.min.js" charset="utf-8"></script>
+    <script>
+
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.98;
+        var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
+        var color = d3.schemeCategory10;
+
+        var dataset = new Array(10);
+
+        for (var i = 0; i < dataset.length; i++) {
+            dataset[i] = height * Math.random();
+        }
+
+        var svg = d3.select("body")			//选择<body>
+            .append("svg")			//在<body>中添加<svg>
+            .attr("width", width)	//设定<svg>的宽度属性
+            .attr("height", height);//设定<svg>的高度属性				
+        //矩形所占的宽度（包括空白），单位为像素		
+        var rectStep = width / dataset.length;
+        //矩形所占的宽度（不包括空白），单位为像素
+        var rectWidth = rectStep - 10;
+        var rect = svg.selectAll("rect")
+            .data(dataset)		//绑定数据
+            .enter()			//获取enter部分
+            .append("rect")	    //添加rect元素，使其与绑定数组的长度一致
+            .attr("x", function (d, i) {		//设置矩形的x坐标
+                return i * rectStep;
+            })
+            .attr("y", height)
+            .attr("fill", (d, i) => color[i % 10])
+            .attr("width", rectWidth)		//设置矩形的宽度
+            .attr("height", 0)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("height", d => d)
+            .attr("y", d => height - d);
+
+        var text = svg.selectAll("text")
+            .data(dataset)			//绑定数据
+            .enter()				//获取enter部分
+            .append("text")			//添加text元素，使其与绑定数组的长度一致
+            .attr("fill", "green")
+            // .attr("fill", function (d, i) {
+            //     return color(i);
+            // })
+            .attr("font-size", "24px")
+            .attr("text-anchor", "middle")
+
+            .attr("x", function (d, i) {
+                return i * rectStep;
+            })
+            .attr("dx", rectWidth / 2)
+            .attr("y", height)
+            .transition()
+            .duration(2000)
+            .ease(d3.easeLinear)
+            .attr("y", 0)
+
+            // .attr("x", function (d, i) {
+            //     return i * rectStep;
+            // })
+            .attr("y", function (d) {
+                return height - d - 26;
+            })
+            .attr("dx", rectWidth / 2)
+            .attr("dy", "1em")
+            .text(function (d) {
+                return Math.floor(d);
+            });
+
+
+    </script>
+    <!-- <svg width="725.1999999999999" height="540">
+        <rect x="0" y="395.45622465000116" fill="#1f77b4" width="62.519999999999996" height="144.54377534999884"></rect>
+        <rect x="72.52" y="137.66803084115435" fill="#ff7f0e" width="62.519999999999996" height="402.33196915884565">
+        </rect>
+        <rect x="145.04" y="232.2944441438371" fill="#2ca02c" width="62.519999999999996" height="307.7055558561629">
+        </rect>
+        <rect x="217.56" y="512.7722006661752" fill="#d62728" width="62.519999999999996" height="27.22779933382484">
+        </rect>
+        <rect x="290.08" y="369.0097033528182" fill="#9467bd" width="62.519999999999996" height="170.9902966471818">
+        </rect>
+        <rect x="362.59999999999997" y="420.40611103113145" fill="#8c564b" width="62.519999999999996"
+            height="119.59388896886854"></rect>
+        <rect x="435.12" y="230.38890237037748" fill="#e377c2" width="62.519999999999996" height="309.6110976296225">
+        </rect>
+        <rect x="507.64" y="441.4435267303774" fill="#7f7f7f" width="62.519999999999996" height="98.55647326962259">
+        </rect>
+        <rect x="580.16" y="135.91576954178248" fill="#bcbd22" width="62.519999999999996" height="404.0842304582175">
+        </rect>
+        <rect x="652.68" y="90.96954732238646" fill="#17becf" width="62.519999999999996" height="449.03045267761354">
+        </rect>
+    </svg> -->
+
+</body>
+
+</html>

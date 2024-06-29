@@ -1,0 +1,64 @@
+<html>
+
+<head>
+	<title>
+		钻石树
+	</title>
+</head>
+
+<body>
+	<svg id="wcSvg" width=800 height=600>
+		<defs>
+			<marker id="arrow" markerWidth="10" markerHeight="10" refx="0" refy="4" orient="auto"
+				markerUnits="strokeWidth">
+				<path d="M3,0 L0,2 L0,6 L3,8 L9,4  z" fill="#eacf01" />
+			</marker>
+		</defs>
+
+	</svg>
+	<script>
+		var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+		var mysvg = document.getElementById("wcSvg");
+		mysvg.setAttribute("width", w * 0.9);
+		mysvg.setAttribute("height", h * 0.9);
+		var length = 300;
+		rate = 0.6;
+		var x0 = w / 2;
+		var y0 = h;
+		var count = 7;
+		var iter = 0;
+		function show(x0, y0, length, rate, a, count) {
+			var x1 = x0;
+			var y1 = y0;
+			var x2 = x1 + length * (0.5 + 0.5 * Math.random()) * Math.cos(a);
+			var y2 = y1 + length * (0.5 + 0.5 * Math.random()) * Math.sin(a);
+			svgline = document.createElement("line");
+			mysvg.appendChild(svgline);
+
+			iter++;
+			var rand = Math.random;
+			if (count > 1) {
+				svgline.outerHTML = "<line x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2 + " style='stroke:rgb(0," + (iter) + ",0);stroke-width:" + (count) + "' />";
+			}
+			else {
+				svgline.outerHTML = "<line x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2 + " stroke='#eacf01' stroke-width='10' 'marker-end='url(#arrow)' />";
+			}
+			var aL = a - Math.PI / 4 * (0.5 + 0.5 * Math.random());
+			var aR = a + Math.PI / 4 * (0.5 + 0.5 * Math.random());
+			if (count > 0) {
+				show(x2, y2, length * rate, rate, aL, count - 1);
+				show(x2, y2, length * rate, rate, aR, count - 1);
+			}
+		}
+		show(x0, y0, length, rate, -Math.PI / 2, count);
+		show(x0, y0, length, rate, -Math.PI * 7 / 16, count);
+		show(x0, y0, length, rate, -Math.PI * 9 / 16, count);
+	</script>
+	<!-- Cloudflare Pages Analytics -->
+	<script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+		data-cf-beacon='{"token": "d912c94599ab449bbf0813bd77f413e8"}'></script><!-- Cloudflare Pages Analytics -->
+</body>
+
+</html>

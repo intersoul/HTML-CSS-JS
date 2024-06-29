@@ -1,0 +1,191 @@
+<html>
+
+<head>
+    <title>
+        《三体》人物关系
+    </title>
+    <style>
+        .tooltip {
+            position: absolute;
+            width: 160px;
+            height: auto;
+            font-family: simsun;
+            font-size: 10px;
+            text-align: left;
+            color: black;
+            border-width: 1px solid black;
+            background-color: 7FFF00;
+            border-radius: 3px;
+        }
+
+        .tooltip:after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 20%;
+            margin-left: -3px;
+            width: 0;
+            height: 0;
+            border-bottom: 12px solid black;
+            border-right: 12px solid transparent;
+            border-left: 12px solid transparent;
+        }
+    </style>
+</head>
+
+<body style=" opacity:1">
+    <script src="../d3.v7.min.js" charset="utf-8"></script>
+    <script type="text/javascript">
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.98;
+        var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+        var nodes;
+        var edges;
+        var color = d3.schemeTableau10;
+
+        d3.json("theThreeBodyProblem.json").then(function (graph) {
+            var forceSimulation = d3.forceSimulation()
+                .force("link", d3.forceLink())
+                .force("charge", d3.forceManyBody().strength(-1000))
+                .force("center", d3.forceCenter(width / 2, height / 2));
+
+            //绘制
+            nodes = graph.nodes;
+            edges = graph.links;
+            console.log(nodes);
+            console.log(edges);
+            forceSimulation.nodes(graph.nodes)
+                .on("tick");
+            //生成边数据
+            forceSimulation.force("link")
+                .links(graph.links)
+                .distance(30);
+
+            //提示框部分
+            var tooltip = d3.selectAll("body")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0.0);
+
+            var img_h = 50;
+            var img_w = 50;
+            var radius = 23;
+
+            for (var i = 0; i < nodes.length; i++) {
+                var sum = 0;
+                for (var j = 0; j < edges.length; j++) {
+                    if ((edges[j].source.index == i) || (edges[j].source.index == i))
+                        sum = sum + 1;
+                }
+                nodes[i].weight = sum;
+            }
+
+            var path = svg.selectAll("path")
+                .data(edges)
+                .enter()
+                .append("path")
+                .attr("id", function (d, i) {
+                    return "edgepath" + i;
+                })
+                .attr("class", "edges")
+                .attr("fill", "none")
+                .attr("stroke", "#666");
+
+            var pathtext = svg.selectAll('g')
+                .data(edges)
+                .enter()
+                .append("text")
+                .append('textPath')
+                .attr("text-anchor", "middle")//居中
+                .attr("startOffset", "50%")
+                .attr('xlink:href', function (d, i) { return "#edgepath" + i; })
+                .style("font-size", "12px")
+                .attr("fill", "blue")
+                .text(function (d) { return d.value; });
+
+            var circles = svg.selectAll("forceCircle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("class", "forceCircle")
+                .attr("r", radius)
+                .style("stroke", "black")
+                .style("stroke-width", "0.5")
+                .attr("fill", function (d, i) {
+                    //创建圆形图片
+                    var defs = svg.append("defs").attr("id", "imgdefs");
+                    var catpattern = defs.append("pattern")
+                        .attr("id", "catpattern" + i)
+                        .attr("height", 1)
+                        .attr("width", 1);
+                    catpattern.append("image")
+                        .attr("x", - (img_w / 2 - radius + 5.8))
+                        .attr("y", - (img_h / 2 - radius + 3.5))
+                        .attr("width", img_w + 11)
+                        .attr("height", img_h + 6)
+                        .attr("xlink:href", "image/" + d.image);
+                    return "url(#catpattern" + i + ")";
+                })
+                .call(drag());
+
+            var texts = svg.selectAll(".forceText")
+                .data(nodes)
+                .enter()
+                .append("text")
+                .attr("class", "forceText")
+                .attr("x", function (d) { return d.x; })
+                .attr("y", function (d) { return d.y; })
+                .style("fill", color[2])
+                .style("stroke-family", "仿宋")
+                .style("font-size", "16px")
+                .attr("text-anchor", "middle")
+                .attr("dy", "2em")
+                .text(function (d) { return d.name; });
+
+            forceSimulation.on("tick", function () {
+                path.attr("d", function (d) {
+                    var dx = d.target.x - d.source.x;//增量
+                    var dy = d.target.y - d.source.y;
+                    return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
+                });
+                circles.attr("cx", function (d) { return d.x; });
+                circles.attr("cy", function (d) { return d.y; });
+                texts.attr("x", function (d) { return d.x; });
+                texts.attr("y", function (d) { return d.y; });
+            });
+
+            function drag() {
+
+                function dragstarted(event, d) {
+                    if (!event.active) forceSimulation.alphaTarget(0.3).restart();
+                    d.fx = d.x;
+                    d.fy = d.y;
+                }
+
+                function dragged(event, d) {
+                    d.fx = event.x;
+                    d.fy = event.y;
+                }
+
+                function dragended(event, d) {
+                    if (!event.active) forceSimulation.alphaTarget(0);
+                    d.fx = null;
+                    d.fy = null;
+                }
+
+                return d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended);
+            }
+        })
+    </script>
+    <!-- Cloudflare Pages Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+        data-cf-beacon='{"token": "d912c94599ab449bbf0813bd77f413e8"}'></script><!-- Cloudflare Pages Analytics -->
+</body>
+
+</html>

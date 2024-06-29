@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        /* 定义节点的样式 */
+        .node {
+            stroke: #fff;
+            /* 设置节点边框颜色为白色 */
+            stroke-width: 1.5px;
+            /* 设置节点边框宽度为1.5像素 */
+        }
+
+        /* 定义连接线的样式 */
+        .link {
+            stroke: #999;
+            /* 设置连接线颜色为灰色 */
+            stroke-opacity: 0.6;
+            /* 设置连接线不透明度为0.6 */
+        }
+    </style>
+</head>
+
+<body>
+    <script src="/JS/d3.v3.min.js"></script>
+
+    <script>
+        // 定义画布宽度为浏览器窗口宽度的98%，高度为浏览器窗口高度的90%
+        var width =
+            (window.innerWidth ||
+                document.documentElement.clientWidth ||
+                document.body.clientWidth) * 0.98;
+        var height =
+            (window.innerHeight ||
+                document.documentElement.clientHeight ||
+                document.body.clientHeight) * 0.9;
+
+        // 创建颜色比例尺，用于为节点分配颜色
+        var color = d3.scale.category10();
+
+        // 创建力导向布局对象，设置参数
+        var force = d3.layout
+            .force()
+            .charge(-120) // 设置节点间的电荷大小
+            .linkDistance(200) // 设置连接线的距离
+            .size([width, height]); // 设置画布大小
+
+        // 创建 SVG 元素，并设置宽度和高度
+        var svg = d3
+            .select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // 从 JSON 文件中读取数据，并执行后续操作
+        d3.json("a.json", function (error, graph) {
+            console.log(graph); // 在控制台输出读取的数据 
+
+            // 将节点和连接线数据添加到力导向布局中，并启动布局
+            force.nodes(graph.nodes)
+                .links(graph.links)
+                //.force.restart()
+                .start(); // 启动布局计算
+
+            // 创建节点元素，并设置样式和事件
+            var node = svg
+                .selectAll(".node")
+                .data(graph.nodes)
+                .enter()
+                .append("circle")
+                .attr("class", "node")
+                .attr("r", 16) // 设置节点半径为16像素
+                .style("fill", function (d) {
+                    return color(d.group); // 根据节点的分组属性分配颜色
+                })
+                .attr("text", function (d) {
+                    return d.name; // 设置节点文本为节点名称
+                })
+                .call(force.drag); // 启用拖拽功能
+
+            // 创建节点元素及其内的文本标签，并设置样式和事件
+            var node = svg
+                .selectAll(".node")
+                .data(graph.nodes)
+                .enter()
+                .append("g") // 添加一个组元素，以便于同时操作节点和其内的文本标签
+                .attr("class", "node")
+                .call(force.drag);
+
+            node.append("circle")
+                .attr("r", 16)
+                .style("fill", function (d) {
+                    return color(d.group);
+                });
+
+            node.append("text") // 添加文本标签
+                .attr("dx", 10) // 文本相对于圆心的水平偏移量
+                .attr("dy", ".35em") // 文本相对于圆心的垂直偏移量（通常使文本居中对齐）
+                .text(function (d) {
+                    return d.name; // 设置文本内容为节点名称
+                });
+
+            // 创建连接线元素，并设置样式
+            var link = svg
+                .selectAll(".link")
+                .data(graph.links)
+                .enter()
+                .append("line")
+                .attr("class", "link")
+                .style("stroke-width", function (d) {
+                    return Math.sqrt(d.value); // 设置连接线宽度为数据中的值的平方根
+                });
+
+            // 定义力导向布局的 tick 事件处理函数，用于更新节点和连接线的位置
+            force.on("tick", function () {
+                // 更新连接线的位置
+                link
+                    .attr("x1", function (d) {
+                        return d.source.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.source.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.target.x;
+                    })
+                    .attr("y2", function (d) {
+                        return d.target.y;
+                    });
+
+                // 更新节点的位置
+                node
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<html>
+
+<body>
+    <center>
+        <h2>数据可视化之JS Canvas 图像处理</h2>
+        <button id="flip">水平翻转</button>
+        <hr width=70%>
+        </hr>
+        <canvas id="myCanvas" width="600" height="400"></canvas>
+        <script type="text/javascript">
+            var c = document.getElementById("myCanvas");
+            var cxt = c.getContext("2d");
+            var img = new Image()
+            img.src = "/img/jiajiazi.jpg"
+            img.onload = function () {
+                // cxt.drawImage(img, 0, 0);
+                // var imageData = cxt.getImageData(0, 0, c.width, c.height);
+                // var data = imageData.data;
+
+                var canvasWidth = c.width;
+                var canvasHeight = c.height;
+                var imageAspectRatio = img.width / img.height;
+                var canvasAspectRatio = canvasWidth / canvasHeight;
+                var renderableWidth, renderableHeight;
+
+                if (imageAspectRatio < canvasAspectRatio) {
+                    renderableWidth = canvasWidth;
+                    renderableHeight = renderableWidth / imageAspectRatio;
+                } else {
+                    renderableHeight = canvasHeight;
+                    renderableWidth = renderableHeight * imageAspectRatio;
+                }
+
+                // 清空 canvas
+                cxt.clearRect(0, 0, canvasWidth, canvasHeight);
+                // 绘制图片
+                cxt.drawImage(img, 0, 0, renderableWidth, renderableHeight);
+
+                var imageData = cxt.getImageData(0, 0, renderableWidth, renderableHeight);
+                var data = imageData.data;
+
+                //dataMatrix
+                var DM = new Array(c.height);
+                for (var i = 0; i < c.height; i++) {
+                    DM[i] = new Array(c.width);
+                    for (var j = 0; j < c.width; j++) {
+                        DM[i][j] = new Array(4);
+                        DM[i][j][0] = data[(i * (c.width) + j) * 4];
+                        DM[i][j][1] = data[(i * (c.width) + j) * 4 + 1];
+                        DM[i][j][2] = data[(i * (c.width) + j) * 4 + 2];
+                        DM[i][j][3] = data[(i * (c.width) + j) * 4 + 3];
+                    }
+                }
+                var flipImage = function () {
+                    //水平翻转
+                    var tempPix
+                    for (var i = 0; i < c.height; i++) {
+                        for (var j = 0; j < c.width; j++) {
+                            if ((i > 0) && (i < c.height - 1) && (j > 0) && (j < c.width - 1)) {
+                                if (i < c.height / 2) {
+                                    for (var k = 0; k < 4; k++) {
+                                        tempPix = DM[i][j][k];
+                                        DM[i][j][k] = DM[c.height - 1 - i][j][k];
+                                        DM[c.height - 1 - i][j][k] = tempPix;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    for (var i = 0; i < c.height; i++) {
+                        for (var j = 0; j < c.width; j++) {
+                            if ((i > 0) && (i < c.height - 1) && (j > 0) && (j < c.width - 1)) {
+                                if (j < c.width / 2) {
+                                    for (var k = 0; k < 4; k++) {
+                                        tempPix = DM[i][j][k];
+                                        DM[i][j][k] = DM[i][c.width - 1 - j][k];
+                                        DM[i][c.width - 1 - j][k] = tempPix;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    for (var i = 0; i < c.height; i++) {
+                        for (var j = 0; j < c.width; j++) {
+                            data[(i * (c.width) + j) * 4] = DM[i][j][0];
+                            data[(i * (c.width) + j) * 4 + 1] = DM[i][j][1];
+                            data[(i * (c.width) + j) * 4 + 2] = DM[i][j][2];
+                            data[(i * (c.width) + j) * 4 + 3] = DM[i][j][3];
+                        }
+                    }
+                    cxt.putImageData(imageData, 0, 0);
+                };
+                // var flipImage = function () {
+                //     //水平翻转
+                //     var tempPix
+                //     for (var i = 0; i < c.height; i++) {
+                //         for (var j = 0; j < c.width; j++) {
+                //             if ((i > 0) && (i < c.height - 1) && (j > 0) && (j < c.width - 1)) {
+                //                 if (j < c.width / 2) {
+                //                     for (var k = 0; k < 4; k++) {
+                //                         tempPix = DM[i][j][k];
+                //                         DM[i][j][k] = DM[i][c.width - 1 - j][k];
+                //                         DM[i][c.width - 1 - j][k] = tempPix;
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //     }
+                //     for (var i = 0; i < c.height; i++) {
+                //         for (var j = 0; j < c.width; j++) {
+                //             data[(i * (c.width) + j) * 4] = DM[i][j][0];
+                //             data[(i * (c.width) + j) * 4 + 1] = DM[i][j][1];
+                //             data[(i * (c.width) + j) * 4 + 2] = DM[i][j][2];
+                //             data[(i * (c.width) + j) * 4 + 3] = DM[i][j][3];
+                //         }
+                //     }
+                //     cxt.putImageData(imageData, 0, 0);
+                // };
+                var flipBtn = document.getElementById('flip');
+                flipBtn.addEventListener('click', flipImage);
+            }
+        </script>
+    </center>
+    <!-- Cloudflare Pages Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+        data-cf-beacon='{"token": "d912c94599ab449bbf0813bd77f413e8"}'></script><!-- Cloudflare Pages Analytics -->
+</body>
+
+</html>

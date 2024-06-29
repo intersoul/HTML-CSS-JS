@@ -1,0 +1,77 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3动画-直方图</title>
+</head>
+
+<body>
+    <script src="/JS/d3.v7.min.js" charset="utf-8"></script>
+    <script>
+
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.98;
+        var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
+        var color = d3.schemeCategory10;
+
+        var dataset = new Array(10);
+        for (var i = 0; i < dataset.length; i++) {
+            dataset[i] = height * Math.random();
+        }
+        var svg = d3.select("body")			//选择<body>
+            .append("svg")			//在<body>中添加<svg>
+            .attr("width", width)	//设定<svg>的宽度属性
+            .attr("height", height);//设定<svg>的高度属性				
+        //矩形所占的宽度（包括空白），单位为像素		
+        var rectStep = width / dataset.length;
+        //矩形所占的宽度（不包括空白），单位为像素
+        var rectWidth = rectStep - 10;
+        var rect = svg.selectAll("rect")
+            .data(dataset)		//绑定数据
+            .enter()			//获取enter部分
+            .append("rect")	    //添加rect元素，使其与绑定数组的长度一致
+            .attr("x", (d, i) => (i * rectStep))
+            .attr("y", (d) => height - d)
+            .attr("fill", (d, i) => color[i % 10])
+            .attr("width", rectWidth)		//设置矩形的宽度		
+            .attr("height", d => d)
+            .on("click", function (d, i) {
+                d3.select(this)
+                    .attr("fill", "green");
+            })
+            .on("mouseover", function (d, i) {
+                d3.select(this)
+                    .attr("fill", "yellow");
+            })
+            .on("mouseout", function (d, i) {
+                d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .attr("fill", "red");
+            });				
+    </script>
+    <!-- <svg width="725.1999999999999" height="540">
+        <rect x="0" y="128.71854195129384" fill="rgb(255, 0, 0)" width="62.519999999999996" height="411.28145804870616">
+        </rect>
+        <rect x="72.52" y="175.57754099631705" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="364.42245900368295"></rect>
+        <rect x="145.04" y="281.0989972005465" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="258.9010027994535"></rect>
+        <rect x="217.56" y="321.3355046362464" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="218.6644953637536"></rect>
+        <rect x="290.08" y="450.64444582232943" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="89.35555417767057"></rect>
+        <rect x="362.59999999999997" y="337.44166649340036" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="202.55833350659967"></rect>
+        <rect x="435.12" y="206.79993451306677" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="333.2000654869332"></rect>
+        <rect x="507.64" y="79.0201207089454" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="460.9798792910546"></rect>
+        <rect x="580.16" y="173.80457455109132" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="366.1954254489087"></rect>
+        <rect x="652.68" y="126.2962725163498" fill="rgb(255, 0, 0)" width="62.519999999999996"
+            height="413.7037274836502"></rect>
+    </svg> -->
+
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3的JSON读取</title>
+    <meta name="viewport" content="width=device-width">
+</head>
+
+<body>
+    <script src=" ./d3.v3.min.js" charset="utf-8">
+    </script>
+    <p>数据展示</p>
+    <script>
+        var mydata;
+        var dataset = new Array(4);
+        var datacolor = new Array(4);
+        var dataheight = new Array(4);
+
+        d3.json("data.json", function (error, data) {
+            // if (error) {
+            //     console.error(error);
+            //     return;
+            // }
+
+            // 在这个回调函数中处理从data.json中获取的数据
+            // 首先将data.height和data.clr存储到数组中
+            for (var i = 0; i < data.height.length; i++) {
+                dataheight[i] = data.height[i];
+                datacolor[i] = data.clr[i];
+            }
+
+            // 接下来可以在这里使用dataheight和datacolor数组
+            console.log(dataheight);
+            console.log(datacolor);
+
+            var p = d3.select("p")
+                .text("数据文件中的值" + data.height[0] + data.height[1] + data.height[2]);
+
+
+
+            var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.98;
+            var height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
+            //var color = d3.scale.category10();
+            // for (var i = 0; i < dataset.length; i++) {
+            //     dataset[i] = height * Math.random();
+            // }
+
+            var svg = d3.select("body")			//选择<body>
+                .append("svg")			//在<body>中添加<svg>
+                .attr("width", width)	//设定<svg>的宽度属性
+                .attr("height", height);//设定<svg>的高度属性				
+            //矩形所占的宽度（包括空白），单位为像素		
+            // var rectStep = width / dataset.length;
+            var rectStep = width / dataheight.length;
+            //矩形所占的宽度（不包括空白），单位为像素
+            var rectWidth = rectStep - 10;
+            var rect = svg.selectAll("rect")
+                .data(dataheight)		//绑定数据
+                .enter()			//获取enter部分
+                .append("rect")	    //添加rect元素，使其与绑定数组的长度一致
+                .attr("x", function (d, i) {		//设置矩形的x坐标
+                    return i * rectStep;
+                })
+                .attr("y", function (d) {		//设置矩形的y坐标
+                    return height - d;
+                })
+                .attr("fill", function (d, i) {
+                    return datacolor[i];
+                })
+                .attr("width", rectWidth)		//设置矩形的宽度
+                .attr("height", function (d) {	//设置矩形的高度
+                    return d;
+                });
+            var text = svg.selectAll("text")
+                .data(dataheight)			//绑定数据
+                .enter()				//获取enter部分
+                .append("text")			//添加text元素，使其与绑定数组的长度一致
+                // .attr("fill", "green")
+                .attr("fill", function (d, i) {
+                    return datacolor[i];
+                })
+                .attr("font-size", "24px")
+                .attr("text-anchor", "middle")
+                .attr("x", function (d, i) {
+                    return i * rectStep;
+                })
+                .attr("y", function (d) {
+                    return height - d - 26;
+                })
+                .attr("dx", rectWidth / 2)
+                .attr("dy", "1em")
+                .text(function (d) {
+                    return Math.floor(d);
+                });
+
+
+        });
+
+
+    </script>
+</body>
+
+</html>
